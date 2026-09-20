@@ -4,13 +4,23 @@
   "type": "module",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --project=chromium --headed",
+    "test:debug": "playwright test --headed --debug",
+    "test:ui": "playwright test --ui",
+    "test:report": "allure generate --clean && allure open",
+    "test:report:playwright": "playwright show-report",
+    "install:browsers": "playwright install"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.1",
+    "@types/node": "^20.14.2",
+    "typescript": "^5.4.5",
+    "dotenv": "^16.4.5",
     "allure-playwright": "^3.12.2"
   }
 }
