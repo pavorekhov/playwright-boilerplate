@@ -16,12 +16,6 @@ test.describe('TC1: Заказ одного товара без скидки', (
     const productName = 'Blue Duck';
     const quantity = 3;
 
-    // Предусловие
-    await test.step('Проверка пустой корзины', async () => {
-      await home.open();
-      await home.expectCartIsEmpty();
-    });
-
     // Логин
     await test.step('Логин', async () => {
       await login.open();
@@ -29,8 +23,16 @@ test.describe('TC1: Заказ одного товара без скидки', (
       await login.expectLoginSuccess();
     });
 
+    // Очистка корзины
+    await test.step('Очистка корзины', async () => {
+      await home.goToCart();
+      await cart.clearCart();
+    });
+
     // Выбор товара без скидки
     await test.step('Выбор товара без скидки', async () => {
+      await home.open();
+      await home.expectCartIsEmpty();
       await home.openProduct(productName);
     });
 

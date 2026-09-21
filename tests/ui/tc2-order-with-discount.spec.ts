@@ -17,12 +17,6 @@ test.describe('TC2: Заказ товара со скидкой', () => {
     const size = 'Small';
     const quantity = 2;
 
-    // Предусловие
-    await test.step('Проверка пустой корзины', async () => {
-      await home.open();
-      await home.expectCartIsEmpty();
-    });
-
     // Логин
     await test.step('Логин', async () => {
       await login.open();
@@ -30,8 +24,16 @@ test.describe('TC2: Заказ товара со скидкой', () => {
       await login.expectLoginSuccess();
     });
 
+    // Очистка корзины
+    await test.step('Очистка корзины', async () => {
+      await home.goToCart();
+      await cart.clearCart();
+    });
+
     // Выбор товара со скидкой
     await test.step('Выбор товара со скидкой', async () => {
+      await home.open();
+      await home.expectCartIsEmpty();
       await home.openProduct(productName);
     });
 

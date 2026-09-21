@@ -4,6 +4,7 @@ export class CartPage {
   readonly page: Page;
   readonly itemRows: Locator;
   readonly confirmOrderButton: Locator;
+  readonly cartItems: Locator;
 
   //поля в форме оформления заказа
   readonly taxIdInput: Locator;
@@ -22,6 +23,7 @@ export class CartPage {
     // строки с айтемами в таблице Order Confirmation
     this.itemRows = page.locator('#order_confirmation-wrapper .dataTable tr:has(td.item)');
     this.confirmOrderButton = page.getByRole('button', { name: /Confirm Order/i });
+    this.cartItems = page.locator('#checkout-cart-wrapper ul.items li.item');
 
     this.taxIdInput = page.locator('input[name="tax_id"]');
     this.companyInput = page.locator('input[name="company"]');
@@ -83,5 +85,13 @@ export class CartPage {
     await expect(this.cityInput).toHaveValue('');
     await expect(this.emailInput).toHaveValue('');
     await expect(this.phoneInput).toHaveValue('');
-}
+  }
+
+  async clearCart() {
+    while (await this.cartItems.count() > 0) {
+      const itemsBefore = await this.cartItems.count();
+      await this.cartItems.first().getByRole('button', { name: 'Remove' }).click();
+      await expect(this.cartItems).toHaveCount(itemsBefore - 1);
+    }
+  }
 }
