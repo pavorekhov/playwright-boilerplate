@@ -42,19 +42,23 @@ export class CartPage {
     await expect(this.itemRows.first()).toBeVisible();
   }
 
+  private getProductRow(productName: string): Locator {
+    return this.itemRows.filter({ has: this.page.locator('td.item', { hasText: productName }) });
+  }
+
   async getQuantityForProduct(productName: string): Promise<string> {
-    const row = this.itemRows.filter({ has: this.page.locator('td.item', { hasText: productName }) });
+    const row = this.getProductRow(productName);
     return (await row.locator('td:nth-child(1)').textContent()) ?? '';
   }
 
   async getUnitPriceForProduct(productName: string): Promise<number> {
-    const row = this.itemRows.filter({ has: this.page.locator('td.item', { hasText: productName }) });
+    const row = this.getProductRow(productName);
     const text = await row.locator('td.unit-cost').textContent();
     return parsePrice(text);
   }
 
   async getTotalForProduct(productName: string): Promise<number> {
-    const row = this.itemRows.filter({ has: this.page.locator('td.item', { hasText: productName }) });
+    const row = this.getProductRow(productName);
     const text = await row.locator('td.sum').textContent();
     return parsePrice(text);
   }

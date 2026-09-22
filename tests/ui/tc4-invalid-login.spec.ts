@@ -1,8 +1,6 @@
-// tests/ui/test-case-4.spec.ts
 import { test } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
 
-// Тест-кейс 4: невалидный логин
 test.describe('TC4: Невалидный логин', () => {
   test('Неверный ввод пароля при логине', async ({ page }) => {
     const login = new LoginPage(page);
