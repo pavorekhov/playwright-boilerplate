@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { parsePrice } from '../utils/price';
 
 export class ProductPage {
   readonly page: Page;
@@ -32,16 +33,10 @@ export class ProductPage {
     const campaignDiscountPrice = this.priceWrapper.locator('.campaign-price');
     if (await campaignDiscountPrice.count()) {
       const priceText = await campaignDiscountPrice.textContent();
-      return this.parsePrice(priceText);
+      return parsePrice(priceText);
     }
     const regularPrice = this.priceWrapper.locator('.price, .regular-price, .price:not(.campaign-price)');
     const priceText = await regularPrice.textContent();
-    return this.parsePrice(priceText);
-  }
-
-  private parsePrice(text: string | null): number {
-    if (!text) return 0;
-    const match = text.match(/\d+(?:[.,]\d+)?/);
-    return match ? parseFloat(match[0].replace(',', '.')) : 0;
+    return parsePrice(priceText);
   }
 }

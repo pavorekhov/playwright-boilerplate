@@ -1,4 +1,5 @@
 import { Page, Locator, expect } from '@playwright/test';
+import { parsePrice } from '../utils/price';
 
 export class CartPage {
   readonly page: Page;
@@ -49,13 +50,13 @@ export class CartPage {
   async getUnitPriceForProduct(productName: string): Promise<number> {
     const row = this.itemRows.filter({ has: this.page.locator('td.item', { hasText: productName }) });
     const text = await row.locator('td.unit-cost').textContent();
-    return this.parsePrice(text);
+    return parsePrice(text);
   }
 
   async getTotalForProduct(productName: string): Promise<number> {
     const row = this.itemRows.filter({ has: this.page.locator('td.item', { hasText: productName }) });
     const text = await row.locator('td.sum').textContent();
-    return this.parsePrice(text);
+    return parsePrice(text);
   }
 
   async confirmOrder() {
@@ -66,12 +67,6 @@ export class CartPage {
   async expectOrderSuccess() {
     await expect(this.page).toHaveURL(/\/order_success$/);
     await expect(this.page.getByText(/Your order is successfully completed!/i)).toBeVisible();
-  }
-
-  private parsePrice(text: string | null): number {
-    if (!text) return 0;
-    const match = text.match(/\d+(?:[.,]\d+)?/);
-    return match ? parseFloat(match[0].replace(',', '.')) : 0;
   }
 
   async expectBillingAddressIsEmpty() {
