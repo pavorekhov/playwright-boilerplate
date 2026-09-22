@@ -1,10 +1,7 @@
-// tests/ui/test-case-3.spec.ts
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../../pages/HomePage';
 import { ProductPage } from '../../pages/ProductPage';
 import { CartPage } from '../../pages/CartPage';
-
-// Тест-кейс 3: Заказ товара без логина и проверка "Recently Viewed".
 
 test.describe('TC3: Гостевая покупка двух товаров и проверка Recently Viewed', () => {
   test('Гостевая покупка двух товаров и проверка Recently Viewed', async ({ page }) => {
@@ -16,6 +13,13 @@ test.describe('TC3: Гостевая покупка двух товаров и �
     const productName2 = 'Yellow Duck';
     const size = 'Small';
     const quantity = 1;
+
+    // Очистка корзины
+    await test.step('Очистка корзины', async () => {
+      await home.open();
+      await home.goToCart();
+      await cart.clearCart();
+    });
 
     // Выбор и добавление первого товара
     let expectedUnitPrice1 = 0;
@@ -38,7 +42,7 @@ test.describe('TC3: Гостевая покупка двух товаров и �
       await product.selectSize(size);
       await product.addToCart();
       await expect(home.cartQuantity).toHaveText(String(quantity * 2));
-      await expect(home.cartTotalValue).toHaveText('$38');
+      await expect(home.cartTotalValue).toHaveText('$38'); // TODO: refactor
     });
 
     // Проверка корзины с двумя товарами

@@ -1,11 +1,9 @@
-// tests/ui/test-case-1.spec.ts
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../../pages/HomePage';
 import { LoginPage } from '../../pages/LoginPage';
 import { ProductPage } from '../../pages/ProductPage';
 import { CartPage } from '../../pages/CartPage';
 
-// Тест-кейс 1: заказ одного продукта без скидки.
 test.describe('TC1: Заказ одного товара без скидки', () => {
   test('Заказ одного товара без скидки', async ({ page }) => {
     const home = new HomePage(page);

@@ -1,13 +1,11 @@
-// tests/ui/test-case-2.spec.ts
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../../pages/HomePage';
 import { LoginPage } from '../../pages/LoginPage';
 import { ProductPage } from '../../pages/ProductPage';
 import { CartPage } from '../../pages/CartPage';
 
-// Тест-кейс 2: заказ одного товара со скидкой.
-test.describe('TC2: Заказ товара со скидкой', () => {
-  test('Заказ товара со скидкой', async ({ page }) => {
+test.describe('TC2: Заказ одного товара со скидкой', () => {
+  test('Заказ одного товара со скидкой', async ({ page }) => {
     const home = new HomePage(page);
     const login = new LoginPage(page);
     const product = new ProductPage(page);
