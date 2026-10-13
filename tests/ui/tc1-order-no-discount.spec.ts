@@ -1,66 +1,77 @@
-import { test, expect } from '@playwright/test';
-import { HomePage } from '../../pages/HomePage';
-import { LoginPage } from '../../pages/LoginPage';
-import { ProductPage } from '../../pages/ProductPage';
-import { CartPage } from '../../pages/CartPage';
+/**
+ * TC1: Заказ одного товара без скидки
+ *
+ * Тест-кейс проверяет процесс оформления заказа авторизованным пользователем
+ * для товара без скидки (Blue Duck).
+ *
+ * Шаги теста:
+ * 1. Авторизация пользователя
+ * 2. Очистка корзины
+ * 3. Выбор товара без скидки
+ * 4. Добавление товара в корзину с указанием количества
+ * 5. Проверка корзины (количество, цена за единицу, общая цена)
+ * 6. Оформление заказа и проверка успеха
+ */
+import { test, expect } from '@fixtures/authenticated';
+import { PRODUCTS, QUANTITIES } from '@data/products';
+import { calculateTotal } from '@utils/price';
 
 test.describe('TC1: Заказ одного товара без скидки', () => {
-  test('Заказ одного товара без скидки', async ({ page }) => {
-    const home = new HomePage(page);
-    const login = new LoginPage(page);
-    const product = new ProductPage(page);
-    const cart = new CartPage(page);
+  test('Заказ одного товара без скидки', async ({ homePage, productPage, cartPage }) => {
+    // Тестовые данные
+    const product = PRODUCTS.blueDuck;
+    const quantity = QUANTITIES.three;
 
-    const productName = 'Blue Duck';
-    const quantity = 3;
-
-    // Логин
-    await test.step('Логин', async () => {
-      await login.open();
-      await login.login(process.env.LOGIN!, process.env.PASSWORD!);
-      await login.expectLoginSuccess();
-    });
-
-    // Очистка корзины
     await test.step('Очистка корзины', async () => {
-      await home.goToCart();
-      await cart.clearCart();
+      // Переходим в корзину и очищаем её перед началом теста
+      await homePage.open();
+      await homePage.goToCart();
+      await cartPage.clearCart();
     });
 
-    // Выбор товара без скидки
     await test.step('Выбор товара без скидки', async () => {
-      await home.open();
-      await home.expectCartIsEmpty();
-      await home.openProduct(productName);
+      // Возвращаемся на главную страницу и проверяем, что корзина пуста
+      await homePage.open();
+      await homePage.expectCartIsEmpty();
+      // Открываем страницу выбранного товара
+      await homePage.openProduct(product.name);
     });
 
-    // Добавление в корзину
     let expectedUnitPrice = 0;
     await test.step('Добавление товара в корзину', async () => {
-      expectedUnitPrice = await product.getUnitPrice();
-      await product.setQuantity(quantity);
-      await product.addToCart();
-      await expect(home.cartQuantity).toHaveText(String(quantity));
+      // Получаем цену товара (без скидки, так как скидки нет)
+      expectedUnitPrice = await productPage.getUnitPrice();
+      // Устанавливаем количество и добавляем в корзину
+      await productPage.setQuantity(quantity);
+      await productPage.addToCart();
+      // Проверяем, что количество в корзине обновилось
+      await expect(homePage.cartQuantity).toHaveText(String(quantity));
     });
 
-    // Проверка корзины
     await test.step('Проверка корзины', async () => {
-      await home.goToCart();
-      await cart.waitForLoad();
-      await expect(cart.itemRows).toHaveCount(1);
-      const qty = await cart.getQuantityForProduct(productName);
+      // Переходим в корзину для проверки деталей заказа
+      await homePage.goToCart();
+      await cartPage.waitForLoad();
+      // Проверяем, что в корзине ровно одна строка с товаром
+      await expect(cartPage.itemRows).toHaveCount(1);
+
+      // Получаем данные о товаре из корзины и проверяем их
+      const qty = await cartPage.getQuantityForProduct(product.name);
       await expect(qty).toBe(String(quantity));
-      const unit = await cart.getUnitPriceForProduct(productName);
-      const total = await cart.getTotalForProduct(productName);
-      const expectedTotal = expectedUnitPrice * quantity;
+
+      const unit = await cartPage.getUnitPriceForProduct(product.name);
+      const total = await cartPage.getTotalForProduct(product.name);
+      const expectedTotal = calculateTotal(expectedUnitPrice, quantity);
+
+      // Проверяем, что цена за единицу и общая цена совпадают с ожидаемыми
       await expect(unit).toBe(expectedUnitPrice);
       await expect(total).toBe(expectedTotal);
     });
 
-    // Оформление заказа
     await test.step('Подтверждение заказа', async () => {
-      await cart.confirmOrder();
-      await cart.expectOrderSuccess();
+      // Оформляем заказ и проверяем успех
+      await cartPage.confirmOrder();
+      await cartPage.expectOrderSuccess();
     });
   });
 });
