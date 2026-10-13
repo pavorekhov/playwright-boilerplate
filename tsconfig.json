@@ -8,12 +8,25 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "types": ["node", "@playwright/test"]
+    "types": ["node", "@playwright/test"],
+    "baseUrl": ".",
+    "paths": {
+      "@pages/*": ["pages/*"],
+      "@fixtures/*": ["fixtures/*"],
+      "@utils/*": ["utils/*"],
+      "@data/*": ["data/*"],
+      "@models/*": ["types/*"],
+      "@config/*": ["config/*"]
+    }
   },
   "include": [
     "tests/**/*.ts",
     "pages/**/*.ts",
+    "fixtures/**/*.ts",
     "utils/**/*.ts",
+    "data/**/*.ts",
+    "types/**/*.ts",
+    "config/**/*.ts",
     "playwright.config.ts"
   ]
 }

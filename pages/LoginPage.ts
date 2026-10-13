@@ -1,39 +1,74 @@
+/**
+ * Страница логина в приложении
+ * Содержит селекторы и методы для взаимодействия с формой авторизации
+ */
 import { Page, Locator, expect } from '@playwright/test';
+import { BasePage } from '@pages/BasePage';
+import { requireEnv } from '@config/env';
 
-export class LoginPage {
-  readonly page: Page;
+export class LoginPage extends BasePage {
+  /** Поле ввода email */
   readonly emailInput: Locator;
+  /** Поле ввода пароля */
   readonly passwordInput: Locator;
+  /** Кнопка входа */
   readonly loginButton: Locator;
+  /** Блок с сообщением об ошибке */
   readonly errorMessage: Locator;
-  readonly loginUrlLink: Locator;
+  /** Ссылка на выход (появляется после успешного логина) */
+  readonly logoutLink: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.emailInput = page.locator('input[name="email"]');
     this.passwordInput = page.locator('input[name="password"]');
     this.loginButton = page.getByRole('button', { name: /Login/i });
     this.errorMessage = page.locator('#notices .notice.errors');
-    this.loginUrlLink = page.locator('#box-account').getByRole('link', { name: /Logout/i });
+    this.logoutLink = page.locator('#box-account').getByRole('link', { name: /Logout/i });
   }
 
-  async open() {
-    await this.page.goto('login');
+  /**
+   * Открывает страницу логина
+   * Ждет, пока поле email станет видимым
+   */
+  async open(): Promise<void> {
+    await super.open('login');
     await expect(this.emailInput).toBeVisible();
   }
 
-  async login(username: string, password: string) {
-    await this.emailInput.fill(username);
+  /**
+   * Выполняет логин с указанными учетными данными
+   * @param email - email пользователя
+   * @param password - пароль пользователя
+   */
+  async login(email: string, password: string): Promise<void> {
+    await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
   }
 
-  async expectLoginSuccess() {
-    await expect(this.page).toHaveURL(process.env.BASE_URL!);
-    await expect(this.loginUrlLink).toBeVisible();
+  /**
+   * Выполняет логин как пользователь
+   * Использует учетные данные из переменных окружения
+   */
+  async loginAsUser(): Promise<void> {
+    await this.login(requireEnv('login'), requireEnv('password'));
   }
 
-  async expectLoginFailedWithErrorMessage() {
-    await expect(this.errorMessage).toContainText(/Wrong password or the account is disabled, or does not exist/i);
+  /**
+   * Проверяет успешный логин
+   * Ожидает, что текущий URL совпадает с базовым и видна ссылка на выход
+   */
+  async expectLoginSuccess(): Promise<void> {
+    await expect(this.page).toHaveURL(requireEnv('baseUrl'));
+    await expect(this.logoutLink).toBeVisible();
+  }
+
+  /**
+   * Проверяет неуспешный логин по наличию сообщения об ошибке
+   * @param messagePattern - регулярное выражение для текста ошибки (по умолчанию стандартное сообщение)
+   */
+  async expectLoginFailed(messagePattern: RegExp = /Wrong password or the account is disabled, or does not exist/i): Promise<void> {
+    await expect(this.errorMessage).toContainText(messagePattern);
   }
 }

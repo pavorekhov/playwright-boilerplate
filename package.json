@@ -2,7 +2,7 @@
   "name": "playwright-boilerplate",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "Scalable Playwright test automation boilerplate with fixtures, page objects, and best practices",
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
@@ -11,7 +11,8 @@
     "test:ui": "playwright test --ui",
     "test:report": "allure generate --clean && allure open",
     "test:report:playwright": "playwright show-report",
-    "install:browsers": "playwright install"
+    "install:browsers": "playwright install",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
